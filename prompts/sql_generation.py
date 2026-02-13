@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-System Prompt for Text-to-SQL Agent
-Optimized for PostgreSQL with pgvector support
+SQL generation prompt for the Text-to-SQL agent.
+Contains the large system prompt with database schema, examples, and rules.
 """
 
 
@@ -430,89 +430,3 @@ IMPORTANT RULES:
     - If you reuse same embedding in query, list it multiple times in embedding_params
 
 Remember: Choose wisely between traditional SQL, Levenshtein for typos, and semantic search based on the query intent!"""
-
-
-def create_final_answer_prompt() -> str:
-    """
-    Create the system prompt for generating final natural language answers.
-    
-    Returns:
-        str: System prompt for answer generation
-    """
-    return """You are a helpful assistant that translates database query results into clear, natural language answers.
-
-Your task is to:
-1. Understand the user's original question
-2. Analyze the query results
-3. Provide a clear, concise, and accurate answer in natural language
-
-Guidelines:
-- Be direct and answer the question specifically
-- Use natural, conversational language
-- If there are multiple results, summarize them clearly
-- If there are no results, explain what that means
-- Don't mention technical details like SQL or database operations unless relevant
-- Focus on the information the user wants to know"""
-
-
-def create_sql_retry_prompt(user_request: str, error_history_text: str) -> str:
-    """
-    Create the user message for SQL query regeneration after failures.
-    
-    Args:
-        user_request: Original user request
-        error_history_text: Formatted text with history of all failed attempts
-        
-    Returns:
-        str: User message with error context for regeneration
-    """
-    return f"""Original request: {user_request}
-
-ALL PREVIOUS ATTEMPTS HAVE FAILED. Here is the complete history:
-{error_history_text}
-
-CRITICAL INSTRUCTIONS:
-1. Analyze ALL previous attempts and their specific errors
-2. DO NOT repeat the same mistakes from previous attempts
-3. If multiple attempts failed with the same type of error, try a completely different approach
-4. Generate a CORRECTED SQL query that addresses ALL the errors seen so far
-
-Common issues to check:
-- Syntax errors (check PostgreSQL syntax carefully)
-- Missing or incorrect table/column names (verify against schema)
-- Incorrect JOINs (ensure proper relationships)
-- Type mismatches (especially with vector types)
-- Missing WHERE clauses for NULL checks on embedding fields
-- Placeholder count mismatch (ensure embedding_params matches %s count in query)
-- If you need to reuse the same embedding multiple times in a query, you MUST list it multiple times in embedding_params
-- Vector columns in GROUP BY: You CANNOT include vector columns (ending in _embed) in GROUP BY
-
-Learn from previous failures and generate a query that will execute successfully."""
-
-
-def create_final_answer_user_message(user_request: str, results_text: str, sql_query: str = None) -> str:
-    """
-    Create the user message for final answer generation.
-    
-    Args:
-        user_request: Original user request
-        results_text: Formatted query results text
-        sql_query: The SQL query that was executed (optional)
-        
-    Returns:
-        str: User message for answer generation
-    """
-    message = f"""User's Question: {user_request}
-
-Query Results:
-{results_text}
-
-Please provide a clear, natural language answer to the user's question based on these results."""
-    
-    # Add SQL context if provided
-    if sql_query:
-        message += f"\n\nFor context, the SQL query used was:\n{sql_query}"
-    
-    return message
-
-

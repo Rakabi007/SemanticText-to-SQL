@@ -5,7 +5,7 @@ Demonstrates the complete pipeline: SQL generation, query execution, and final a
 """
 
 import sys
-from text_to_sql_agent import AgentTextToSql
+from core.agent import AgentTextToSql
 
 
 def print_result(result: dict):

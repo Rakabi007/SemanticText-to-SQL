@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Database Schema Utilities for Text-to-SQL Applications
+Database Schema Utilities for Text-to-SQL Applications.
+Extracts and formats schema information for LLM consumption.
 """
 
 import json
 from typing import Dict, List, Any
+
 
 def get_table_schema(cursor, table_name: str) -> Dict[str, Any]:
     """Get detailed schema information for a specific table."""
@@ -108,6 +110,7 @@ def get_table_schema(cursor, table_name: str) -> Dict[str, Any]:
         'check_constraints': check_constraints
     }
 
+
 def get_all_tables(cursor) -> List[str]:
     """Get list of all user tables in the database."""
     cursor.execute("""
@@ -117,6 +120,7 @@ def get_all_tables(cursor) -> List[str]:
         ORDER BY table_name;
     """)
     return [row[0] for row in cursor.fetchall()]
+
 
 def format_schema_for_llm(schema_data: Dict[str, Any]) -> str:
     """Format schema data in a human-readable format optimized for LLMs."""
@@ -170,6 +174,7 @@ def format_schema_for_llm(schema_data: Dict[str, Any]) -> str:
     output.append("\n")
     return "\n".join(output)
 
+
 def generate_relationships_summary(schemas: List[Dict[str, Any]]) -> str:
     """Generate a summary of table relationships."""
     output = []
@@ -209,6 +214,7 @@ def generate_relationships_summary(schemas: List[Dict[str, Any]]) -> str:
     
     output.append("\n")
     return "\n".join(output)
+
 
 def generate_db_schema(connection) -> tuple[str, str]:
     """

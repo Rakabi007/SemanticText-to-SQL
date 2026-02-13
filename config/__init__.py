@@ -1,0 +1,9 @@
+from config.settings import (
+    DB_CONFIG,
+    OPENAI_API_KEY,
+    EMBEDDING_MODEL,
+    EMBEDDING_DIMENSIONS,
+    LLM_MODEL,
+    LLM_TEMPERATURE,
+    MAX_RETRIES,
+)
